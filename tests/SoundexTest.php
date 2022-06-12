@@ -1,22 +1,28 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-
-class Soundex 
-{
-    public function encode(string $word) 
-    {
-        return "A";
-    }
-}
+use App\Soundex;
 
 class SoundexTest extends TestCase 
 {
+    protected $soundex;
+
+    protected function setUp(): void
+    {
+        $this->soundex = new Soundex();
+    }
+
     public function testRetainsSoleLetterOfOneLetterWord()
     {
-        $soundex = new Soundex();
-        $encoded = $soundex->encode('A');
+        $encoded = $this->soundex->encode('A');
 
-        $this->assertSame("A", $encoded);
+        $this->assertSame("A000", $encoded);
+    }
+
+    public function testPadsWithZerosToEnsureThreeDigits()
+    {
+        $encoded = $this->soundex->encode("I");
+
+        $this->assertSame("I000", $encoded);
     }
 }
