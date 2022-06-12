@@ -14,15 +14,31 @@ class SoundexTest extends TestCase
 
     public function testRetainsSoleLetterOfOneLetterWord()
     {
-        $encoded = $this->soundex->encode('A');
-
-        $this->assertSame("A000", $encoded);
+        $this->assertSame("A000", $this->soundex->encode('A'));
     }
 
     public function testPadsWithZerosToEnsureThreeDigits()
     {
-        $encoded = $this->soundex->encode("I");
+        $this->assertSame("I000", $this->soundex->encode("I"));
+    }
 
-        $this->assertSame("I000", $encoded);
+    public function testReplacesConsonantsWithAppropriateDigits()
+    {
+        $this->assertSame("A200", $this->soundex->encode("Ax"));
+    }
+
+    public function testIgnoresNonAlphabetics()
+    {
+        $this->assertSame("A000", $this->soundex->encode("A#"));
+    }
+
+    public function testReplacesMultipleConsonantsWithDigits()
+    {
+        $this->assertSame("A234", $this->soundex->encode("Acdl"));
+    }
+
+    public function testLimitsLengthToFourCharacters()
+    {
+        $this->assertSame("4u", $this->soundex->encode("Dcdlb"));
     }
 }
