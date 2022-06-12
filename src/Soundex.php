@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 namespace App;
 
-class Soundex 
+class Soundex
 {
     const MAX_CODE_LENGTH = 4;
 
@@ -15,9 +15,11 @@ class Soundex
         'r' => '6'
     ];
 
+    const NOT_A_DIGIT = "*";
+
     public function encode(string $word) : string
     {
-        return $this->zeroPad($this->head($word) . $this->encodedDigits($this->tail($word)));
+        return $this->zeroPad($this->upperFront($this->head($word)) . $this->encodedDigits($this->tail($word)));
     }
 
     private function head(string $word): string
@@ -34,20 +36,48 @@ class Soundex
     {
         $encoding = "";
         foreach (str_split($word) as $letter) {
-            $encoding .= $this->encodedDigit($letter);
+            if ($this->isComplete($encoding))
+                break;
+
+            $digit = $this->encodedDigit($letter);
+            if ($digit != self::NOT_A_DIGIT && $digit != $this->lastDigit($encoding))
+                $encoding .= $this->encodedDigit($letter);
         }
 
         return $encoding;
     }
 
-    private function encodedDigit(string $letter): string
+    public function encodedDigit(string $letter): string
     {
-        return key_exists($letter, self::ENCODINGS) ? self::ENCODINGS[$letter] : "";
+        return key_exists($this->lower($letter), self::ENCODINGS) ? self::ENCODINGS[$this->lower($letter)] : self::NOT_A_DIGIT;
     }
 
     private function zeroPad(string $word): string
     {
         $zerosNeeded = self::MAX_CODE_LENGTH - strlen($word);
         return $word . str_repeat('0', $zerosNeeded);
+    }
+
+    private function isComplete(string $encoding): bool
+    {
+        return strlen($encoding) == self::MAX_CODE_LENGTH - 1;
+    }
+
+    private function lastDigit(string $encoding): string
+    {
+        if (empty($encoding))
+            return "";
+
+        return substr($encoding, -1);
+    }
+
+    private function upperFront(string $string): string
+    {
+        return strtoupper($string);
+    }
+
+    private function lower(string $letter): string
+    {
+        return strtolower($letter);
     }
 }

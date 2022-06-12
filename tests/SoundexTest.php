@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 use App\Soundex;
 
-class SoundexTest extends TestCase 
+class SoundexTest extends TestCase
 {
     protected $soundex;
 
@@ -27,7 +27,7 @@ class SoundexTest extends TestCase
         $this->assertSame("A200", $this->soundex->encode("Ax"));
     }
 
-    public function testIgnoresNonAlphabetics()
+    public function testIgnoresNonAlphabetic()
     {
         $this->assertSame("A000", $this->soundex->encode("A#"));
     }
@@ -39,6 +39,30 @@ class SoundexTest extends TestCase
 
     public function testLimitsLengthToFourCharacters()
     {
-        $this->assertSame("4u", $this->soundex->encode("Dcdlb"));
+        $this->assertEquals("4", strlen($this->soundex->encode("Dcdlb")));
     }
+
+    public function testIgnoresVowelLikeLetters()
+    {
+        $this->assertSame("B234", $this->soundex->encode("BaAeEiIoOuUhHyYcdl"));
+    }
+
+     public function testCombinesDuplicateEncodings()
+     {
+         $this->assertSame($this->soundex->encodedDigit('b'), $this->soundex->encodedDigit('f'));
+         $this->assertSame($this->soundex->encodedDigit('c'), $this->soundex->encodedDigit('g'));
+         $this->assertSame($this->soundex->encodedDigit('d'), $this->soundex->encodedDigit('t'));
+
+         $this->assertSame("A123", $this->soundex->encode("Abfcgdt"));
+     }
+
+     public function testUppercaseFirstLetter()
+     {
+         $this->assertStringStartsWith("A", $this->soundex->encode("abcd"));
+     }
+
+     public function testIgnoresCaseWhenEncodingConsonants()
+     {
+         $this->assertSame($this->soundex->encode("Bcdl"), $this->soundex->encode("BCDL"));
+     }
 }

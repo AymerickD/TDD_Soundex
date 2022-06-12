@@ -14,5 +14,8 @@
             "name": "Aymerick Demay",
             "email": "a.demay@lemon-interactive.fr"
         }
-    ]
+    ],
+    "scripts": {
+        "test": "./vendor/bin/phpunit --colors=always tests"
+    }
 }
