@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use App\Soundex;
+use App\Entity\Soundex;
 
 class SoundexTest extends TestCase
 {
@@ -47,22 +47,37 @@ class SoundexTest extends TestCase
         $this->assertSame("B234", $this->soundex->encode("BaAeEiIoOuUhHyYcdl"));
     }
 
-     public function testCombinesDuplicateEncodings()
-     {
-         $this->assertSame($this->soundex->encodedDigit('b'), $this->soundex->encodedDigit('f'));
-         $this->assertSame($this->soundex->encodedDigit('c'), $this->soundex->encodedDigit('g'));
-         $this->assertSame($this->soundex->encodedDigit('d'), $this->soundex->encodedDigit('t'));
+    public function testCombinesDuplicateEncodings()
+    {
+        $this->assertSame($this->soundex->encodedDigit('b'), $this->soundex->encodedDigit('f'));
+        $this->assertSame($this->soundex->encodedDigit('c'), $this->soundex->encodedDigit('g'));
+        $this->assertSame($this->soundex->encodedDigit('d'), $this->soundex->encodedDigit('t'));
 
-         $this->assertSame("A123", $this->soundex->encode("Abfcgdt"));
-     }
+        $this->assertSame("A123", $this->soundex->encode("Abfcgdt"));
+    }
 
-     public function testUppercaseFirstLetter()
-     {
-         $this->assertStringStartsWith("A", $this->soundex->encode("abcd"));
-     }
+    public function testUppercaseFirstLetter()
+    {
+        $this->assertStringStartsWith("A", $this->soundex->encode("abcd"));
+    }
 
-     public function testIgnoresCaseWhenEncodingConsonants()
-     {
-         $this->assertSame($this->soundex->encode("Bcdl"), $this->soundex->encode("BCDL"));
-     }
+    public function testIgnoresCaseWhenEncodingConsonants()
+    {
+        $this->assertSame($this->soundex->encode("Bcdl"), $this->soundex->encode("BCDL"));
+    }
+
+    public function testCombinesDuplicateCodesWhen2ndLetterDuplicates1st()
+    {
+    $this->assertSame("B230", $this->soundex->encode("Bbcd"));
+    }
+     
+    public function testDoesNotCombineDuplicateEncodingsSeparatedByVowels()
+    {
+        $this->assertSame("J110", $this->soundex->encode("Jbob"));
+    }
+
+    public function testCombineDuplicateEncodingsSeparatedByHOrW()
+    {
+        $this->assertSame("B341", $this->soundex->encode("Bthtlf"));
+    }
 }
